@@ -48,7 +48,7 @@ class Ship {
 
     this.angle += this.rotation;
 
-    // Handle screen edges
+    
     if (this.x < 0 - this.radius) this.x = canvas.width + this.radius;
     if (this.x > canvas.width + this.radius) this.x = 0 - this.radius;
     if (this.y < 0 - this.radius) this.y = canvas.height + this.radius;
@@ -57,6 +57,32 @@ class Ship {
 }
 
 const ship = new Ship();
+
+document.addEventListener('keydown', (event) => {
+  switch(event.key) {
+    case 'ArrowUp':
+      ship.thrusting = true;
+      break;
+    case 'ArrowLeft':
+      ship.rotation = -0.1;
+      break;
+    case 'ArrowRight':
+      ship.rotation = 0.1;
+      break;
+  }
+});
+
+document.addEventListener('keyup', (event) => {
+  switch(event.key) {
+    case 'ArrowUp':
+      ship.thrusting = false;
+      break;
+    case 'ArrowLeft':
+    case 'ArrowRight':
+      ship.rotation = 0;
+      break;
+  }
+});
 
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
