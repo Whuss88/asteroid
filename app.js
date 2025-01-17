@@ -11,7 +11,7 @@ class Bullet {
     this.radius = 5;
     this.speed = 5;
     this.velX = Math.cos(this.angle) * this.speed;
-    this.velY = Math.sin(this.angle) * this.speed;
+    this.velY = -Math.sin(this.angle) * this.speed;
   }
 
   draw() {
