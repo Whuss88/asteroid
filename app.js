@@ -3,6 +3,36 @@ const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
+class Bullet {
+  constructor(x, y, angle) {
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+    this.radius = 5;
+    this.speed = 5;
+    this.velX = Math.cos(this.angle) * this.speed;
+    this.velY = Math.sin(this.angle) * this.speed;
+  }
+
+  draw() {
+    ctx.fillStyle = 'white';
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  update() {
+    this.x += this.velX;
+    this.y += this.velY;
+
+    if (this.x < 0) this.x = canvas.width;
+    if (this.x > canvas.width) this.x = 0;
+    if (this.y < 0) this.y = canvas.height;
+    if (this.y > canvas.height) this.y = 0;
+  }
+}
+
 class Ship {
   constructor() {
     this.x = canvas.width / 2;
@@ -13,7 +43,13 @@ class Ship {
     this.thrusting = false;
     this.thrust = { x: 0, y: 0 };
     this.health = 3;
-    this.lastCollisionTime = 0; 
+    this.lastCollisionTime = 0;
+    this.bullets = [];
+  }
+
+  fire() {
+    const bullet = new Bullet(this.x, this.y, this.angle);
+    this.bullets.push(bullet);
   }
 
   draw() {
@@ -35,7 +71,8 @@ class Ship {
     ctx.closePath();
     ctx.stroke();
 
-   
+    this.bullets.forEach(bullet => bullet.draw());
+
     ctx.font = "20px Arial";
     ctx.fillStyle = "white";
     ctx.fillText("Health: " + this.health, 20, 30);
@@ -59,6 +96,8 @@ class Ship {
     if (this.x > canvas.width + this.radius) this.x = 0 - this.radius;
     if (this.y < 0 - this.radius) this.y = canvas.height + this.radius;
     if (this.y > canvas.height + this.radius) this.y = 0 - this.radius;
+
+    this.bullets.forEach(bullet => bullet.update());
   }
 
   reset() {
@@ -86,6 +125,9 @@ document.addEventListener('keydown', (event) => {
       break;
     case 'ArrowRight':
       ship.rotation = 0.1;
+      break;
+    case ' ':
+      ship.fire();
       break;
   }
 });
@@ -168,13 +210,11 @@ function gameLoop(timestamp) {
     const currentTime = Date.now();
     if (dist(ship.x, ship.y, asteroid.x, asteroid.y) < ship.radius + asteroid.radius) {
       if (currentTime - ship.lastCollisionTime > 1000) { 
-        console.log('Collision detected!');
         ship.health -= 1;
         ship.lastCollisionTime = currentTime; 
 
         if (ship.health > 0) {
           ship.reset();
-          console.log('Ship Health After Collision: ', ship.health);
         } else {
           alert("Game Over! Restarting...");
           ship.health = 3;
@@ -187,4 +227,4 @@ function gameLoop(timestamp) {
   requestAnimationFrame(gameLoop);
 }
 
-gameLoop();
+requestAnimationFrame(gameLoop);
