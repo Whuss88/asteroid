@@ -84,10 +84,54 @@ document.addEventListener('keyup', (event) => {
   }
 });
 
+class Asteroid {
+  constructor(x, y, radius) {
+    this.x = x;
+    this.y = y;
+    this.radius = radius;
+    this.angle = Math.random() * Math.PI * 2;
+    this.speed = Math.random() * 2 + 1;
+    this.velX = Math.cos(this.angle) * this.speed;
+    this.velY = Math.sin(this.angle) * this.speed;
+  }
+
+  draw() {
+    ctx.strokeStyle = 'white';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  update() {
+    this.x += this.velX;
+    this.y += this.velY;
+
+   
+    if (this.x < 0 - this.radius) this.x = canvas.width + this.radius;
+    if (this.x > canvas.width + this.radius) this.x = 0 - this.radius;
+    if (this.y < 0 - this.radius) this.y = canvas.height + this.radius;
+    if (this.y > canvas.height + this.radius) this.y = 0 - this.radius;
+  }
+}
+
+const asteroids = [];
+for (let i = 0; i < 10; i++) {
+  asteroids.push(new Asteroid(Math.random() * canvas.width, Math.random() * canvas.height, 30));
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   ship.update();
   ship.draw();
+
+  asteroids.forEach((asteroid) => {
+    asteroid.update();
+    asteroid.draw();
+  });
+
   requestAnimationFrame(gameLoop);
 }
 
