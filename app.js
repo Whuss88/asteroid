@@ -33,6 +33,8 @@ class Bullet {
   }
 }
 
+let bullets = [];
+
 class Ship {
   constructor() {
     this.x = canvas.width / 2;
@@ -49,7 +51,7 @@ class Ship {
 
   fire() {
     const bullet = new Bullet(this.x, this.y, this.angle);
-    this.bullets.push(bullet);
+    bullets.push(bullet);
   }
 
   draw() {
@@ -71,7 +73,7 @@ class Ship {
     ctx.closePath();
     ctx.stroke();
 
-    this.bullets.forEach(bullet => bullet.draw());
+    bullets.forEach(bullet => bullet.draw());
 
     ctx.font = "20px Arial";
     ctx.fillStyle = "white";
@@ -203,18 +205,33 @@ function gameLoop(timestamp) {
   ship.update(deltaTime);
   ship.draw();
 
-  asteroids.forEach((asteroid) => {
+  const currentAsteroids = [...asteroids];
+  currentAsteroids.forEach((asteroid, asteroidIndex) => {
     asteroid.update();
     asteroid.draw();
 
+    const currentBullets = [...bullets];
+    currentBullets.forEach((bullet, bulletIndex) => {
+      bullet.update();
+
+      if (dist(bullet.x, bullet.y, asteroid.x, asteroid.y) < bullet.radius + asteroid.radius) {
+        console.log('Bullet hit asteroid!');
+        
+        asteroids.splice(asteroidIndex, 1);
+        bullets.splice(bulletIndex, 1);
+      }
+    });
+
     const currentTime = Date.now();
     if (dist(ship.x, ship.y, asteroid.x, asteroid.y) < ship.radius + asteroid.radius) {
-      if (currentTime - ship.lastCollisionTime > 1000) { 
+      if (currentTime - ship.lastCollisionTime > 1000) {
+        console.log('Ship hit asteroid!');
         ship.health -= 1;
-        ship.lastCollisionTime = currentTime; 
+        ship.lastCollisionTime = currentTime;
 
         if (ship.health > 0) {
           ship.reset();
+          console.log('Ship Health After Collision: ', ship.health);
         } else {
           alert("Game Over! Restarting...");
           ship.health = 3;
