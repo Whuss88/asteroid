@@ -12,6 +12,7 @@ class Ship {
     this.rotation = 0;
     this.thrusting = false;
     this.thrust = { x: 0, y: 0 };
+    this.health = 3;
   }
 
   draw() {
@@ -32,6 +33,10 @@ class Ship {
     );
     ctx.closePath();
     ctx.stroke();
+    
+    ctx.font = "20px Arial";
+    ctx.fillStyle = "white";
+    ctx.fillText("Health: " + this.health, 20, 30);
   }
 
   update() {
@@ -53,6 +58,16 @@ class Ship {
     if (this.x > canvas.width + this.radius) this.x = 0 - this.radius;
     if (this.y < 0 - this.radius) this.y = canvas.height + this.radius;
     if (this.y > canvas.height + this.radius) this.y = 0 - this.radius;
+  }
+
+  reset() {
+    this.x = canvas.width / 2;
+    this.y = canvas.height / 2;
+    this.thrust.x = 0;
+    this.thrust.y = 0;
+    this.angle = 0;
+    this.rotation = 0;
+    this.thrusting = false;
   }
 }
 
@@ -121,18 +136,39 @@ for (let i = 0; i < 10; i++) {
   asteroids.push(new Asteroid(Math.random() * canvas.width, Math.random() * canvas.height, 30));
 }
 
+function dist(x1, y1, x2, y2) {
+  return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+}
+
 function gameLoop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
   ship.update();
   ship.draw();
 
-  asteroids.forEach((asteroid) => {
+  asteroids.forEach((asteroid, index) => {
     asteroid.update();
     asteroid.draw();
+
+
+    if (dist(ship.x, ship.y, asteroid.x, asteroid.y) < ship.radius + asteroid.radius) {
+      console.log('Collision detected!');
+      ship.health -= 1;
+      ship.reset();
+
+      if (ship.health === 0) {
+        alert("Game Over! Restarting...");
+        ship.health = 3;
+        asteroids.splice(0, asteroids.length);
+        for (let i = 0; i < 10; i++) {
+          asteroids.push(new Asteroid(Math.random() * canvas.width, Math.random() * canvas.height, 30));
+        }
+      }
+    }
   });
 
   requestAnimationFrame(gameLoop);
 }
 
 gameLoop();
+
