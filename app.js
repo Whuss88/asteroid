@@ -184,6 +184,8 @@ class Asteroid {
   }
 }
 
+
+
 function createAsteroids(numAsteroids) {
   const asteroids = [];
   for (let i = 0; i < numAsteroids; i++) {
@@ -194,7 +196,13 @@ function createAsteroids(numAsteroids) {
   return asteroids;
 }
 
-let asteroids = createAsteroids(10);
+let currentLevel = 1;
+let asteroids = createAsteroids(currentLevel * 2 + 8);
+
+function nextLevel() {
+  currentLevel++;
+  asteroids = createAsteroids(currentLevel * 2 + 8);
+}
 
 function dist(x1, y1, x2, y2) {
   return Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
@@ -251,6 +259,10 @@ function gameLoop(timestamp) {
       }
     }
   });
+
+  if (asteroids.length === 0) {
+    nextLevel();
+  }
 
   requestAnimationFrame(gameLoop);
 }
