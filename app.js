@@ -4,7 +4,7 @@ canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 class Bullet {
-  constructor(x, y, angle) {
+  constructor(x, y, angle, duration = 1000) {
     this.x = x;
     this.y = y;
     this.angle = angle;
@@ -12,6 +12,8 @@ class Bullet {
     this.speed = 5;
     this.velX = Math.cos(this.angle) * this.speed;
     this.velY = -Math.sin(this.angle) * this.speed;
+    this.duration = duration;
+    this.creationTime = Date.now();
   }
 
   draw() {
@@ -30,6 +32,10 @@ class Bullet {
     if (this.x > canvas.width) this.x = 0;
     if (this.y < 0) this.y = canvas.height;
     if (this.y > canvas.height) this.y = 0;
+
+    if (Date.now() - this.creationTime >= this.duration) {
+      this.remove = true;
+    }
   }
 }
 
@@ -213,6 +219,11 @@ function gameLoop(timestamp) {
     const currentBullets = [...bullets];
     currentBullets.forEach((bullet, bulletIndex) => {
       bullet.update();
+
+      if(bullet.remove) {
+        bullets.splice(bulletIndex, 1);
+        return;
+      }
 
       if (dist(bullet.x, bullet.y, asteroid.x, asteroid.y) < bullet.radius + asteroid.radius) {
         console.log('Bullet hit asteroid!');
