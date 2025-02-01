@@ -161,13 +161,26 @@ class Asteroid {
     this.speed = Math.random() * 2 + 1;
     this.velX = Math.cos(this.angle) * this.speed;
     this.velY = Math.sin(this.angle) * this.speed;
+    this.vertices = Math.floor(Math.random() * 4) + 6;
+    this.angleOffsets = [];
+
+    for (let i = 0; i < this.vertices; i++) {
+      this.angleOffsets.push(Math.random() * Math.PI * 2);
+    }
   }
 
   draw() {
     ctx.strokeStyle = 'white';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    for (let i = 0; i < this.vertices; i++) {
+      let angle = (Math.PI * 2 / this.vertices) * i + this.angleOffsets[i];
+      let x = this.x + Math.cos(angle) * this.radius;
+      let y = this.y + Math.sin(angle) * this.radius;
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    // ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
     ctx.closePath();
     ctx.stroke();
   }
