@@ -14,6 +14,7 @@ class Bullet {
     this.velY = -Math.sin(this.angle) * this.speed;
     this.duration = duration;
     this.creationTime = Date.now();
+    this.remove = false;
   }
 
   draw() {
@@ -24,9 +25,9 @@ class Bullet {
     ctx.fill();
   }
 
-  update() {
-    this.x += this.velX;
-    this.y += this.velY;
+  update(deltaTime) {
+    this.x += this.velX * (deltaTime / 16.67);
+    this.y += this.velY * (deltaTime / 16.67);
 
     if (this.x < 0) this.x = canvas.width;
     if (this.x > canvas.width) this.x = 0;
@@ -105,7 +106,7 @@ class Ship {
     if (this.y < 0 - this.radius) this.y = canvas.height + this.radius;
     if (this.y > canvas.height + this.radius) this.y = 0 - this.radius;
 
-    this.bullets.forEach(bullet => bullet.update());
+    bullets.forEach(bullet => bullet.update(deltaTime));
   }
 
   reset() {
@@ -239,7 +240,7 @@ function gameLoop(timestamp) {
 
     const currentBullets = [...bullets];
     currentBullets.forEach((bullet, bulletIndex) => {
-      bullet.update();
+      bullet.update(deltaTime);
 
       if(bullet.remove) {
         bullets.splice(bulletIndex, 1);
@@ -267,7 +268,8 @@ function gameLoop(timestamp) {
         } else {
           alert("Game Over! Restarting...");
           ship.health = 3;
-          asteroids = createAsteroids(10);
+          currentLevel = 1;
+          asteroids = createAsteroids(currentLevel * 2 + 8);
         }
       }
     }
@@ -279,5 +281,6 @@ function gameLoop(timestamp) {
 
   requestAnimationFrame(gameLoop);
 }
+
 
 requestAnimationFrame(gameLoop);
